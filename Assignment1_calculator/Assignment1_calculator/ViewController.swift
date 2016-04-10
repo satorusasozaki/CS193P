@@ -11,12 +11,15 @@ import UIKit
 class ViewController: UIViewController {
 
     @IBOutlet weak var display: UILabel!
+    @IBOutlet weak var history: UILabel!
 
     var userIsInTheMiddleOfTypingANumber: Bool = false
     var pointIsEntered: Bool = false 
     
     @IBAction func appendDigit(sender: UIButton) {
         let digit = sender.currentTitle!
+        
+        history.text = history.text! + digit
         
         if userIsInTheMiddleOfTypingANumber {
             display.text = display.text! + digit
@@ -27,6 +30,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onDecimalPoint(sender: UIButton) {
+        history.text = history.text! + sender.currentTitle!
         if userIsInTheMiddleOfTypingANumber {
             display.text = display.text! + sender.currentTitle!
         } else {
@@ -36,6 +40,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onPi(sender: UIButton) {
+        history.text = history.text! + sender.currentTitle!
         let x = M_PI
         if !userIsInTheMiddleOfTypingANumber {
             display.text = "\(x)"
@@ -45,6 +50,7 @@ class ViewController: UIViewController {
     
     @IBAction func operate(sender: UIButton) {
         let operation = sender.currentTitle!
+        history.text = history.text! + operation
         if userIsInTheMiddleOfTypingANumber {
             enter()
         }
@@ -82,8 +88,13 @@ class ViewController: UIViewController {
         userIsInTheMiddleOfTypingANumber = false
         operandStack.append(displayValue)
         print("\(operandStack)")
+        history.text = history.text! + " "
     }
 
+    @IBAction func onClear(sender: UIButton) {
+        display.text = "0"
+        history.text = ""
+    }
     var displayValue: Double {
         get {
             return NSNumberFormatter().numberFromString(display.text!)!.doubleValue
