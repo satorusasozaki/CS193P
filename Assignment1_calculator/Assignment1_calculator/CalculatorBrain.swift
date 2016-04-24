@@ -9,12 +9,16 @@
 import Foundation
 
 class CalculatorBrain {
+    
+    var variableValues: Dictionary<String,Double>?
+    
     // http://ufcpp.net/study/csharp/st_enum.html
     // 特定の値しか取らないようなもの（例えば曜日など）に対して使う型
     private enum Op: CustomStringConvertible {
         case Operand(Double)
         case UnaryOperation(String, Double -> Double)
         case BinaryOperation(String, (Double, Double) -> Double)
+        case Variable(String)
         var  description: String {
             get {
                 switch self {
@@ -24,6 +28,8 @@ class CalculatorBrain {
                     return symbol
                 case .BinaryOperation(let symbol, _):
                     return symbol
+                case .Variable(let variable):
+                    return variable
                 }
             }
         }
@@ -32,7 +38,7 @@ class CalculatorBrain {
     private var opStack = [Op]()         // Array<Op>
     private var knownOps = [String:Op]() // Dictionary<String, Op>()
     
-    // Initializer will get called when 
+    // Initializer will get called when
     // // let brain = CalculatorBrain()
     init() {
         func learnOp(op: Op) {
@@ -43,11 +49,7 @@ class CalculatorBrain {
         learnOp(Op.BinaryOperation("+", +))
         learnOp(Op.BinaryOperation("−", {$1 - $0}))
         learnOp(Op.UnaryOperation("√", sqrt))
-//        knownOps["×"] = Op.BinaryOperation("×", *)
-//        knownOps["÷"] = Op.BinaryOperation("÷") {$1 / $0}
-//        knownOps["+"] = Op.BinaryOperation("+", +)
-//        knownOps["−"] = Op.BinaryOperation("−") {$1 - $0}
-//        knownOps["√"] = Op.UnaryOperation("√", sqrt)
+        variableValues = [String:Double]()
     }
     // tuple is a small struct
     // there is hidden let in front of ops: [Op], let ops: [Op]
@@ -74,6 +76,8 @@ class CalculatorBrain {
                         return (operation(operand1, operand2), op2Evaluation.remainingOps)
                     }
                 }
+            case .Variable(let variable):
+                return (variableValues![variable], remainingOps)
             }
         }
         return (nil,ops)
@@ -88,6 +92,11 @@ class CalculatorBrain {
     
     func pushOperand(operand: Double) -> Double? {
         opStack.append(Op.Operand(operand))
+        return evaluate()
+    }
+    
+    func pushOperand(symbol: String) -> Double? {
+        opStack.append(Op.Variable(symbol))
         return evaluate()
     }
     
