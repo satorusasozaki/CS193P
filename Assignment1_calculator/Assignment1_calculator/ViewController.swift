@@ -91,8 +91,8 @@ class ViewController: UIViewController {
         }
         
         set {
-            if newValue != nil {
-                display.text = "\(newValue!)"
+            if let x = newValue {
+                display.text = "\(x)"
             } else {
                 display.text = ""
             }
